@@ -19,6 +19,24 @@ class basemodel(Model):
         out = self.out(out)
         return out
 
+class basemodel_rasp(Model):
+    def __init__(self, classes):
+        super(basemodel_rasp, self).__init__()
+        self.nl1 = layers.experimental.preprocessing.Normalization(axis = -1)
+        self.fc1 = layers.Dense(units = 10, activation = 'relu')
+        self.bn1 = layers.BatchNormalization()
+        self.fc2 = layers.Dense(units = 5, activation = 'relu')
+        self.out = layers.Dense(units = classes, activation = 'softmax')
+    
+    def call(self, x, training = False, mask = None):
+        out = self.nl1(x)
+        out = self.fc1(out)
+        out = self.bn1(out)
+        out = self.fc2(out)
+        out = self.out(out)
+        return out
+    
+    
 class ann(Model):
     def __init__(self):
         super(ann, self).__init__()
