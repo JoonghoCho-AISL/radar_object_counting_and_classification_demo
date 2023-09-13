@@ -14,30 +14,36 @@ raw_path = 'sample_data/raw_data/raw_data'
 
 prepro_key = 'preprocessed_data'
 raw_key = 'raw_data'
+def complex_encoder(z):
+    return {"real": z.real, "imag": z.imag}
 
-# 복소수를 문자열로 변환하는 함수
-def complex_to_str(c):
-    # 복소수인지 확인
-    if isinstance(c, complex):
-        return f"{c.real}+{c.imag}j"
-    return str(c)
+# 딕셔너리 (실수와 허수 부분)를 복소수로 변환
+def complex_decoder(z_dict):
+    return complex(z_dict["real"], z_dict["imag"])
 
-def array_to_list(arr):
-    return [[complex_to_str(c) for c in row] for row in arr]
-
-for i in range(300):
+for frame in range(300):
     preprocessed_data = sensor.read_data().tolist()
     raw_data = np.array(sensor.raw_data)
+    for i in range(len(raw_data)):
+        for j in range(len(raw_data[i])):
+            raw_data[i][j] = complex(raw_data[i][j])
+    
+    raw_data = raw_data.tolist()
 
+    for i in range(len(raw_data)):
+        for j in range(len(raw_data[i])):
+            raw_data[i][j] = complex_encoder(raw_data[i][j])
+
+    print(type(raw_data[0][0]))
 
     prepro_dict = {prepro_key : preprocessed_data}
     raw_dict = {raw_key : raw_data}
 
-    temp_prepro_path = preprocessed_path + str(i) + '.json'
-    temp_raw_path = raw_path + str(i) + '.json'
+    temp_prepro_path = preprocessed_path + str(frame) + '.json'
+    temp_raw_path = raw_path + str(frame) + '.json'
 
     save_json(temp_prepro_path, json.dumps(prepro_dict))
-    save_json(temp_raw_path, json.dumps(array_to_list(raw_dict)))
+    save_json(temp_raw_path, json.dumps(raw_dict))
 
     print('save : ', temp_prepro_path)
     print('save : ', temp_raw_path)
