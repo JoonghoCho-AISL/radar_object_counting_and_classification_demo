@@ -3,6 +3,7 @@ import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from keras.utils.np_utils import to_categorical
+import h5py
 import os
 # from acconeer.exptool import a121
 # import h5py
@@ -39,6 +40,18 @@ def read_data(data_path, data_dict):
                 if file != '.DS_Store':
                     data_dict[i][file] = np.mean(np.load(os.path.join(d, file)), axis = 1)
     return data_dict
+
+def read_h5_data(data_path, data_dict):
+    for i in os.listdir(data_path):
+        d = os.path.join(data_path, i)
+        h5_data_list = list()
+        if os.path.isdir(d):
+            for file in os.listdir(d):
+                if file != '.DS_Store':
+                    f = h5py.File(os.path.join(d, file), 'r')
+                    data = f['session']['group_0']['entry_0']['result']['frame']
+                    data_dict[i][file] = np.mean(np.load(os.path.join(d, file)), axis = 1)
+    
 
 def createData(Dict : dict) -> dict :
     """
